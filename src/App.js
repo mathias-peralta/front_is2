@@ -1,54 +1,26 @@
-import "./App.css";
+// src/App.js
 
-// Material UI imports
-import Chip from "@mui/material/Chip";
-import FaceIcon from "@mui/icons-material/Face";
-import Paper from "@mui/material/Paper";
-import LockIcon from "@mui/icons-material/Lock";
+import React from 'react';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+// Importa otros componentes como Dashboard, etc.
 
-import Switch from "@mui/material/Switch";
-import { useState } from "react";
-import Login from "./formControl/login";
-import Signup from "./formControl/signup";
+import CreateWorkspace from './components/CreateWorkspace';
 
 function App() {
-  const [checked, setChecked] = useState(true);
-
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-  };
-
   return (
-    <div className="App">
-      <Paper elevation={3} style={{ padding: "10px", paddingBottom: "50px" }}>
-        <div align="center">
-          {checked ? (
-            <Chip
-              icon={<LockIcon />}
-              label="Ingresar"
-              variant="outlined"
-              color="info"
-            />
-          ) : (
-            <Chip
-              icon={<FaceIcon />}
-              label="Registrarse"
-              variant="outlined"
-              color="info"
-            />
-          )}
-          <br />
-
-          <Switch
-            checked={checked}
-            onChange={handleChange}
-            inputProps={{ "aria-label": "controlled" }}
-          />
-        </div>
-
-        {checked ? <Login /> : <Signup />}
-      </Paper>
-    </div>
+      <div className="app-container">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login/>}/>
+          <Route path="/register" element={<Register/>}/>
+          {/* Rutas protegidas */}
+          {/* <PrivateRoute path="/dashboard" component={Dashboard} /> */}
+          <Route path="/espaciotrabajo" element={<CreateWorkspace/>}/>
+        </Routes>
+      </BrowserRouter>
+      </div>
   );
 }
 
