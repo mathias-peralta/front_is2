@@ -142,6 +142,23 @@ export default function Login() {
         />
       </div>
 
+      <div style={{ marginTop: "10px" }}>
+        <TextField
+          error={usernameError}
+          label="Apellido usuario"
+          id="standard-basic"
+          variant="standard"
+          sx={{ width: "100%" }}
+          size="small"
+          value={usernameInput}
+          InputProps={{}}
+          onChange={(event) => {
+            setUsernameInput(event.target.value);
+          }}
+          onBlur={handleUsername}
+        />
+      </div>
+
       <div style={{ marginTop: "5px" }}>
         <TextField
           label="Dirección de correo electrónico"
