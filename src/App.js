@@ -7,6 +7,9 @@ import Register from './components/Register';
 // Importa otros componentes como Dashboard, etc.
 
 import CreateWorkspace from './components/CreateWorkspace';
+import CreateBoard from './components/CreateBoard';
+import Board from './components/Board';
+
 
 function App() {
   return (
@@ -17,7 +20,10 @@ function App() {
           <Route path="/register" element={<Register/>}/>
           {/* Rutas protegidas */}
           {/* <PrivateRoute path="/dashboard" component={Dashboard} /> */}
-          <Route path="/espaciotrabajo" element={<CreateWorkspace/>}/>
+          <Route path="/create-workspace" element={<CreateWorkspace/>}/>
+          <Route path="/create-board" element={<CreateBoard/>}/>
+          <Route path="/tableros/:id" element={<Board/>}/>
+          {/* Otras rutas protegidas */}
         </Routes>
       </BrowserRouter>
       </div>
