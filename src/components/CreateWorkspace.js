@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
+import API_URL from '../config';
 
 const CreateWorkspace = () => {
   //Estado para el nombre del espacio de trabajo
@@ -19,7 +20,7 @@ const CreateWorkspace = () => {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await axios.get('/api/usuarios');
+        const response = await axios.get('API_URL/usuarios');
         const opcionesUsuarios = response.data.map((usuario) => ({
           value: usuario.id,
           label: usuario.nombre,
@@ -52,7 +53,7 @@ const CreateWorkspace = () => {
         },
       };
       //Enviar la solicitud POST al backend
-      const response = await axios.post('/api/espacios', data);
+      const response = await axios.post('/API_URL/espacios', data);
 
 
       //Mostrar mensaje de exito y limpiar el formulario

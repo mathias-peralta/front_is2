@@ -24,7 +24,7 @@ const Register = () => {
     };
 
     try {
-      const response = await axios.post('/api/register', data);
+      const response = await axios.post('API_URL/register', data);
 
       setMensaje('Registro exitoso. Ahora puedes iniciar sesión.');
       // Redirigir al inicio de sesión después de un breve retraso

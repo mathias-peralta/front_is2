@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 //import Dashboard from './src/components/Dashboard';
+import API_URL from '../config';
+
 
 const Login = () => {
   const [nombreUsuario, setNombreUsuario] = useState('');
@@ -22,7 +24,7 @@ const Login = () => {
 
     try {
       //Realizar la solicitud POST al endpoint de autenticacion
-      const response = await axios.post('/api/login', data);
+      const response = await axios.post('/API_URL/login', data);
 
       //Suponiendo que el token viene en response.data.token
       const token = response.data.token;
