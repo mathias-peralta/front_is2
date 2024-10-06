@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../api';
 
 const Register = () => {
   const [nombreUsuario, setNombreUsuario] = useState('');
@@ -24,7 +25,7 @@ const Register = () => {
     };
 
     try {
-      const response = await axios.post('API_URL/register', data);
+      const response = await api.post('/register', data);
 
       setMensaje('Registro exitoso. Ahora puedes iniciar sesión.');
       // Redirigir al inicio de sesión después de un breve retraso
@@ -33,7 +34,7 @@ const Register = () => {
       }, 2000);
     } catch (error) {
       console.error('Error al registrar:', error);
-      if (error.response && error.response.data && error.response.data.error) {
+      if (error.responde && error.response.data && error.response.data.error) {
         setMensaje(error.response.data.error);
       } else {
         setMensaje('Error al registrar. Por favor, intenta más tarde.');

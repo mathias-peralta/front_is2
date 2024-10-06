@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import API_URL from '../config';
+import api from '../api';
 
 const Board = () => {
   const { id } = useParams(); // ID del tablero
@@ -24,7 +24,7 @@ const Board = () => {
     const fetchTablero = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('/API_URL/tableros/${id}', {
+        const response = await api.get('/tableros${id}', {
             headers: { Authorization: 'Bearer ${token}'},
         });
         setTablero(response.data);
@@ -33,7 +33,7 @@ const Board = () => {
         // Obtener las tareas para cada lista
         const tareasPorLista = {};
         for (const lista of response.data.listas) {
-          const resTareas = await axios.get('/API_URL/listas/${lista.id}', {
+          const resTareas = await api.get('/listas${id}', {
             headers: { Authorization: 'Bearer ${token}'},
           });
           tareasPorLista[lista.id] = resTareas.data;
@@ -61,7 +61,7 @@ const Board = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/API_URL/listas', data, {
+      const response = await api.post('/listas', data, {
         headers: { Authorization: 'Bearer ${token}'},
       });
 
@@ -87,7 +87,7 @@ const Board = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/API_URL/tareas', data, {
+      const response = await api.post('/tareas', data, {
         headers: { Authorization: 'Bearer ${token}'},
       });
 
@@ -123,7 +123,7 @@ const esWIPExcedido = (listaId) => {
     if (window.confirm('¿Estás seguro de eliminar esta lista?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete('/API_URL/listas/${listaId}', {
+        await api.delete('/listas${id}', {
             headers: { Authorization: 'Bearer ${token}'},
         });
 
@@ -147,7 +147,7 @@ const esWIPExcedido = (listaId) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('/API_URL/listas/${editandoListaId}', data, {
+      const response = await api.put('/listas${editandoListaId}', data, {
         headers: { Authorization: 'Bearer ${token}'},
       });
 

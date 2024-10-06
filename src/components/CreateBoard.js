@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import API_URL from '../config';
+import api from '../api';
+
 
 const CreateBoard = () => {
   const [nombreTablero, setNombreTablero] = useState('');
@@ -23,7 +24,7 @@ const CreateBoard = () => {
           setMensaje('No estás autenticado. Por favor, inicia sesión.');
           return;
         }
-        const response = await axios.get('/API_URL/espacios', {
+        const response = await api.get('/espacios', {
           headers: { Authorization: 'Bearer ${token}'},
         });
         setEspaciosTrabajo(response.data);
@@ -58,7 +59,7 @@ const CreateBoard = () => {
         setCargando(false);
         return;
       }
-      const response = await axios.post('/API_URL/tableros', data, {
+      const response = await api.post('/tableros', data, {
         headers: { Authorization: 'Bearer ${token}'},
       });
 

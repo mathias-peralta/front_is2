@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 //import Dashboard from './src/components/Dashboard';
-import API_URL from '../config';
+import api from '../api';
 
 
 const Login = () => {
-  const [nombreUsuario, setNombreUsuario] = useState('');
-  const [contraseña, setContraseña] = useState('');
+  const [correoUsuario, setCorreoUsuario] = useState('');
+  const [contrasena, setContrasena] = useState('');
   const [mensaje, setMensaje] = useState('');
 
   const history = useNavigate();
@@ -18,13 +18,13 @@ const Login = () => {
     e.preventDefault();
 
     const data = {
-      nombreUsuario,
-      contraseña,
+      correoUsuario,
+      contrasena,
     };
 
     try {
       //Realizar la solicitud POST al endpoint de autenticacion
-      const response = await axios.post('/API_URL/login', data);
+      const response = await api.post('/login', data);
 
       //Suponiendo que el token viene en response.data.token
       const token = response.data.token;
@@ -52,11 +52,11 @@ const Login = () => {
       {mensaje && <p className="error-message">{mensaje}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Nombre de Usuario:</label>
+          <label>Correo Electrónico:</label>
           <input
             type="text"
-            value={nombreUsuario}
-            onChange={(e) => setNombreUsuario(e.target.value)}
+            value={correoUsuario}
+            onChange={(e) => setCorreoUsuario(e.target.value)}
             required
           />
         </div>
@@ -64,8 +64,8 @@ const Login = () => {
           <label>Contraseña:</label>
           <input
             type="password"
-            value={contraseña}
-            onChange={(e) => setContraseña(e.target.value)}
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
             required
           />
         </div>
