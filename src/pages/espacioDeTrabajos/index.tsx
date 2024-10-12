@@ -1,5 +1,7 @@
 import { getAllUsers, UsuariosResponse } from "@/api/users";
+import { createWorksPace } from "@/api/workspace";
 import HomeLayout from "@/layouts/home/layout";
+import AlertContext from "@/providers/alertProvider";
 import { Add } from "@mui/icons-material";
 import {
   Box,
@@ -10,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
 
 interface FormikProps {
@@ -40,6 +42,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
+  const alert = useContext(AlertContext);
 
   useEffect(() => {
     getUsers();
@@ -54,14 +57,32 @@ const HomePage = () => {
     console.log(response);
   };
   const validationSchema = Yup.object({
-    emailUser: Yup.string()
-      .email("Ingrese un correo valido")
-      .max(255)
-      .required("Correo es requerido"),
-    password: Yup.string().max(255).required("Contraseña es requerido"),
+    workspaceName: Yup.string().max(255).required("Este campo es requerido"),
   });
 
-  const handleOnSubmit = () => {};
+  const handleOnSubmit = async () => {
+    setIsLoading(true);
+    const response = await createWorksPace({
+      nombre_espacio: values.workspaceName,
+      fecha_creacion: new Date(),
+      estado_trabajo: "activo",
+      propietario: 1,
+      descripcion_espacio: "Espacio para realizar tareas",
+    });
+    if (!response) {
+      handleClose();
+      alert.handleAlert(
+        "algo salio mal, intente de nuevo mas tarde",
+        3,
+        "error"
+      );
+      setIsLoading(false);
+      return;
+    }
+    handleClose();
+
+    setIsLoading(false);
+  };
 
   const {
     values,
@@ -117,7 +138,7 @@ const HomePage = () => {
                 </MenuItem>
               ))}
           </TextField>
-          <Button variant="contained" onClick={handleOpen} fullWidth>
+          <Button variant="contained" onClick={handleOnSubmit} fullWidth>
             Crear
           </Button>
         </Box>
