@@ -21,13 +21,12 @@ export default async function handler(
         .status(loginReques.status)
         .json({ message: "algo salio mal!" });
     }
-    // Generar token (ejemplo con token falso)
-    const token = "fake-jwt-token";
+    const token = loginReques.data.token;
 
     // Configurar la cookie con el token
     res.setHeader(
       "Set-Cookie",
-      serialize("token", loginReques.data.token, {
+      serialize("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
         sameSite: "strict",
