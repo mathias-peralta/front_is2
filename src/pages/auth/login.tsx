@@ -1,4 +1,3 @@
-import { loginUser } from "@/api/auth";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import { setToken } from "@/redux/features/authSlice";
@@ -12,6 +11,7 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import axios from "axios";
 import { useFormik } from "formik";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -35,13 +35,14 @@ const AuthLoginPage = (params: any) => {
 
   const handleLogin = async () => {
     try {
-      const response = await loginUser({
+      const response = await axios.post("/api/login", {
         correo_usuario: values.emailUser,
         password_usuario: values.password,
       });
-      if (!response) throw new Error("Error en el login");
 
-      dispatch(setToken(response.token));
+      if (response.status !== 200) throw new Error("Error en el login");
+
+      dispatch(setToken(response.data.token));
       // Redirigir al home
       router.push("/");
     } catch (error) {
