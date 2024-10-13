@@ -7,6 +7,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Home from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import TableChartIcon from "@mui/icons-material/TableChart";
 import WorkIcon from "@mui/icons-material/Work";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -25,7 +26,6 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { useRouter } from "next/router";
 import * as React from "react";
-
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -247,6 +247,54 @@ const HomeLayout = ({ children }: Props) => {
               </ListItemIcon>
               <ListItemText
                 primary={"Espacio de trabajo"}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key={"tablero"} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => router.push("/tablero")}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <ListItemIcon
+                sx={[
+                  {
+                    minWidth: 0,
+                    justifyContent: "center",
+                  },
+                  open
+                    ? {
+                        mr: 3,
+                      }
+                    : {
+                        mr: "auto",
+                      },
+                ]}
+              >
+                <TableChartIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Tablero"}
                 sx={[
                   open
                     ? {

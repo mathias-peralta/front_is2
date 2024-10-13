@@ -18,24 +18,7 @@ import * as Yup from "yup";
 interface FormikProps {
   workspaceName: string;
 }
-const currencies = [
-  {
-    value: "USD",
-    label: "$",
-  },
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
+
 const HomePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
