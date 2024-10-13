@@ -6,7 +6,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Home from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import WorkIcon from "@mui/icons-material/Work";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
@@ -23,6 +22,8 @@ import ListItemText from "@mui/material/ListItemText";
 import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import axios from "axios";
+import { useRouter } from "next/router";
 import * as React from "react";
 
 const drawerWidth = 240;
@@ -112,6 +113,7 @@ const Drawer = styled(MuiDrawer, {
 const HomeLayout = ({ children }: Props) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -121,6 +123,10 @@ const HomeLayout = ({ children }: Props) => {
     setOpen(false);
   };
 
+  const handleLogout = async () => {
+    await axios.post("/api/logout"); // Llama a la API que elimina el token
+    router.push("/auth/login"); // Redirige al login después del logout
+  };
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -157,109 +163,157 @@ const HomeLayout = ({ children }: Props) => {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Inicio", "Espacio de trabajo"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                onClick={() => console.log(text)}
+          <ListItem key={"Inicio"} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => router.push("/")}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <ListItemIcon
                 sx={[
                   {
-                    minHeight: 48,
-                    px: 2.5,
+                    minWidth: 0,
+                    justifyContent: "center",
                   },
                   open
                     ? {
-                        justifyContent: "initial",
+                        mr: 3,
                       }
                     : {
-                        justifyContent: "center",
+                        mr: "auto",
                       },
                 ]}
               >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
+                <Home />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Inicio"}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key={"workspace"} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => router.push("/espacioDeTrabajos")}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
                       justifyContent: "center",
                     },
-                    open
-                      ? {
-                          mr: 3,
-                        }
-                      : {
-                          mr: "auto",
-                        },
-                  ]}
-                >
-                  {index % 2 === 0 ? <Home /> : <WorkIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+              ]}
+            >
+              <ListItemIcon
+                sx={[
+                  {
+                    minWidth: 0,
+                    justifyContent: "center",
+                  },
+                  open
+                    ? {
+                        mr: 3,
+                      }
+                    : {
+                        mr: "auto",
+                      },
+                ]}
+              >
+                <WorkIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Espacio de trabajo"}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
         </List>
         <Divider />
         <List>
-          {["Cerrar sesión"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                onClick={() => console.log("cerrar sesión")}
+          <ListItem
+            key={"cerrar sesion"}
+            disablePadding
+            sx={{ display: "block" }}
+          >
+            <ListItemButton
+              onClick={handleLogout}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <ListItemIcon
                 sx={[
                   {
-                    minHeight: 48,
-                    px: 2.5,
+                    minWidth: 0,
+                    justifyContent: "center",
                   },
                   open
                     ? {
-                        justifyContent: "initial",
+                        mr: 3,
                       }
                     : {
-                        justifyContent: "center",
+                        mr: "auto",
                       },
                 ]}
               >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
-                      justifyContent: "center",
-                    },
-                    open
-                      ? {
-                          mr: 3,
-                        }
-                      : {
-                          mr: "auto",
-                        },
-                  ]}
-                >
-                  {index % 2 === 0 ? <LogoutIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Cerrar Sesión"}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
