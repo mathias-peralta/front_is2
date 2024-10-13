@@ -17,3 +17,15 @@ export const getAllUsers = async () => {
     return null;
   }
 };
+
+export const getUserById = async (id: string) => {
+  try {
+    const response = await API.get<UsuariosResponse>(`/api/user/${id}`);
+
+    if (response.status !== 200) return null;
+
+    return response.data;
+  } catch {
+    return null;
+  }
+};

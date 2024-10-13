@@ -1,3 +1,4 @@
+import { getUserById } from "@/api/users";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import { setToken } from "@/redux/features/authSlice";
@@ -13,6 +14,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { useFormik } from "formik";
+import { jwtDecode } from "jwt-decode";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -42,7 +44,13 @@ const AuthLoginPage = (params: any) => {
 
       if (response.status !== 200) throw new Error("Error en el login");
 
+      const decoded = jwtDecode(response.data.token); // Decodifica el token (solo header y payload)
+      const userData = await getUserById(decoded?.userId);
+
+      if (!userData) throw new Error("Error al obtener datos del usuario");
+
       dispatch(setToken(response.data.token));
+
       // Redirigir al home
       router.push("/");
     } catch (error) {
