@@ -5,9 +5,9 @@ interface Props {
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Home from "@mui/icons-material/Home";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import WorkIcon from "@mui/icons-material/Work";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -210,9 +210,10 @@ const HomeLayout = ({ children }: Props) => {
         </List>
         <Divider />
         <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
+          {["Cerrar sesión"].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
+                onClick={() => console.log("cerrar sesión")}
                 sx={[
                   {
                     minHeight: 48,
@@ -242,7 +243,7 @@ const HomeLayout = ({ children }: Props) => {
                         },
                   ]}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {index % 2 === 0 ? <LogoutIcon /> : <MailIcon />}
                 </ListItemIcon>
                 <ListItemText
                   primary={text}
