@@ -2,7 +2,7 @@ import API from "@/config/API";
 import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
   message: string;
 }
@@ -34,7 +34,9 @@ export default async function handler(
         path: "/",
       })
     );
-    return res.status(200).json({ token: loginReques.data.token });
+    return res
+      .status(200)
+      .json({ token: loginReques.data.token, message: "Login exitoso" });
   } catch {
     return res.status(500).json({ error: "Error en el login" });
   }

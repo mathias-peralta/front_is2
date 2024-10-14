@@ -2,6 +2,8 @@ interface Props {
   children: React.ReactNode;
 }
 
+import { selectUser } from "@/redux/features/userSlice";
+import { RootState } from "@/redux/store";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Home from "@mui/icons-material/Home";
@@ -26,6 +28,7 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { useRouter } from "next/router";
 import * as React from "react";
+import { useSelector } from "react-redux";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -114,6 +117,7 @@ const HomeLayout = ({ children }: Props) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
+  const user = useSelector((state: RootState) => selectUser(state.userState));
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -147,7 +151,7 @@ const HomeLayout = ({ children }: Props) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            IS2
+            Bienvenido, {user?.nombre_usuario}
           </Typography>
         </Toolbar>
       </AppBar>
