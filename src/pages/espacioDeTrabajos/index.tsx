@@ -1,11 +1,21 @@
 import { getAllUsers, UsuariosResponse } from "@/api/users";
-import { createWorksPace } from "@/api/workspace";
-import HomeLayout from "@/layouts/home/layout";
+import {
+  createWorksPace,
+  getAllWorkspaces,
+  WorkspaceResponse,
+} from "@/api/workspace";
+import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
 import { Add } from "@mui/icons-material";
 import {
   Box,
   Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Divider,
+  Grid,
+  Link,
   MenuItem,
   Modal,
   TextField,
@@ -14,7 +24,6 @@ import {
 import { useFormik } from "formik";
 import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
-
 interface FormikProps {
   workspaceName: string;
 }
@@ -22,6 +31,9 @@ interface FormikProps {
 const HomePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
+  const [workspaceList, setWorkspaceList] = useState<
+    WorkspaceResponse[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
@@ -29,16 +41,22 @@ const HomePage = () => {
 
   useEffect(() => {
     getUsers();
+    getWorkspaceList();
   }, []);
 
+  const getWorkspaceList = async () => {
+    setIsLoading(true);
+    const workspaceList = await getAllWorkspaces();
+    setWorkspaceList(workspaceList);
+    setIsLoading(false);
+  };
   const getUsers = async () => {
     setIsLoading(true);
     const response = await getAllUsers();
     setUsers(response);
     setIsLoading(false);
-
-    console.log(response);
   };
+
   const validationSchema = Yup.object({
     workspaceName: Yup.string().max(255).required("Este campo es requerido"),
   });
@@ -83,8 +101,15 @@ const HomePage = () => {
     onSubmit: handleOnSubmit,
   });
 
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
   return (
-    <>
+    <Box sx={{ my: 2 }}>
       <Modal
         open={modalIsOpen}
         onClose={handleClose}
@@ -126,15 +151,41 @@ const HomePage = () => {
           </Button>
         </Box>
       </Modal>
-      <Typography>Espacio de trabajos</Typography>
+      <Typography variant="h3" sx={{ marginBottom: 2 }}>
+        Espacio de trabajos
+      </Typography>
       <Button variant="contained" onClick={handleOpen} endIcon={<Add />}>
-        Crear espacio de trabajo
+        Nuevo espacio de trabajo
       </Button>
-    </>
+      <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
+      <Grid container spacing={2}>
+        {workspaceList &&
+          workspaceList?.map((workspace, index) => (
+            <Grid md={4} xs={12}>
+              <Link
+                href={"/espacioDeTrabajos/" + workspace.id_espacio}
+                sx={{ textDecoration: "none" }}
+              >
+                <Card sx={{ minHeight: 200, textDecoration: "none" }}>
+                  <CardContent>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "flex-end" }}
+                    ></Box>
+
+                    <Typography variant="h6">
+                      {workspace.nombre_espacio}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Link>
+            </Grid>
+          ))}
+      </Grid>
+    </Box>
   );
 };
 
-HomePage.getLayout = (page: any) => <HomeLayout>{page}</HomeLayout>;
+HomePage.getLayout = (page: any) => <WorkspaceLayout>{page}</WorkspaceLayout>;
 
 export default HomePage;
 
