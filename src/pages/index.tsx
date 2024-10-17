@@ -4,7 +4,7 @@ import { Typography } from "@mui/material";
 const HomePage = () => {
   return (
     <>
-      <Typography>Hola mundo asdsad adasdsdasdad!</Typography>
+      <Typography>Gestión de Tareas</Typography>
     </>
   );
 };

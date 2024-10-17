@@ -3,6 +3,7 @@ import {
   createWorksPace,
   getAllWorkspaces,
   WorkspaceResponse,
+  inactivarEspacio, // Función para inactivar espacios
 } from "@/api/workspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
@@ -24,6 +25,7 @@ import {
 import { useFormik } from "formik";
 import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
+
 interface FormikProps {
   workspaceName: string;
 }
@@ -31,14 +33,14 @@ interface FormikProps {
 const HomePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [workspaceList, setWorkspaceList] = useState<WorkspaceResponse[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const handleOpen = () => setModalIsOpen(true);
-  const handleClose = () => setModalIsOpen(false);
   const alert = useContext(AlertContext);
 
+  const handleOpen = () => setModalIsOpen(true);
+  const handleClose = () => setModalIsOpen(false);
+
+  // Cargar los datos cuando el componente se monte
   useEffect(() => {
     getUsers();
     getWorkspaceList();
@@ -46,15 +48,37 @@ const HomePage = () => {
 
   const getWorkspaceList = async () => {
     setIsLoading(true);
-    const workspaceList = await getAllWorkspaces();
-    setWorkspaceList(workspaceList);
-    setIsLoading(false);
+    try {
+      const workspaceList = await getAllWorkspaces();
+      console.log("Espacios de trabajo obtenidos:", workspaceList);
+      if (workspaceList) {
+        setWorkspaceList(workspaceList);
+      } else {
+        alert.handleAlert("No se encontraron espacios de trabajo.", 3, "warning");
+      }
+    } catch (error) {
+      console.error("Error al obtener los espacios de trabajo:", error);
+      alert.handleAlert("Error al cargar espacios de trabajo", 3, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   const getUsers = async () => {
     setIsLoading(true);
-    const response = await getAllUsers();
-    setUsers(response);
-    setIsLoading(false);
+    try {
+      const response = await getAllUsers();
+      if (response) {
+        setUsers(response);
+      } else {
+        alert.handleAlert("No se encontraron usuarios.", 3, "warning");
+      }
+    } catch (error) {
+      console.error("Error al obtener los usuarios:", error);
+      alert.handleAlert("Error al cargar usuarios", 3, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const validationSchema = Yup.object({
@@ -63,33 +87,34 @@ const HomePage = () => {
 
   const handleOnSubmit = async () => {
     setIsLoading(true);
-    const response = await createWorksPace({
-      nombre_espacio: values.workspaceName,
-      fecha_creacion: new Date(),
-      estado_trabajo: "activo",
-      propietario: 1,
-      descripcion_espacio: "Espacio para realizar tareas",
-    });
-    if (!response) {
-      handleClose();
-      alert.handleAlert(
-        "algo salio mal, intente de nuevo mas tarde",
-        3,
-        "error"
-      );
+    try {
+      const response = await createWorksPace({
+        nombre_espacio: values.workspaceName,
+        fecha_creacion: new Date(),
+        estado_trabajo: "activo",
+        propietario: 1,
+        descripcion_espacio: "Espacio para realizar tareas",
+      });
+      if (!response) {
+        handleClose();
+        alert.handleAlert("Algo salió mal, intente de nuevo más tarde", 3, "error");
+      } else {
+        alert.handleAlert("Espacio de trabajo creado con éxito", 3, "success");
+        handleClose();
+        getWorkspaceList(); // Actualizar la lista después de crear un nuevo espacio
+      }
+    } catch (error) {
+      console.error("Error al crear el espacio de trabajo:", error);
+      alert.handleAlert("Error al crear espacio de trabajo", 3, "error");
+    } finally {
       setIsLoading(false);
-      return;
     }
-    handleClose();
-
-    setIsLoading(false);
   };
 
   const {
     values,
     errors,
     touched,
-    setErrors,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -101,6 +126,21 @@ const HomePage = () => {
     onSubmit: handleOnSubmit,
   });
 
+  const handleInactivar = async (id_espacio: number, id_usuario: number) => {
+    try {
+      const resultado = await inactivarEspacio(id_espacio, id_usuario);
+      if (resultado) {
+        alert.handleAlert("Espacio de trabajo inactivado con éxito.", 3, "success");
+        getWorkspaceList(); // Actualiza la lista de espacios después de inactivar uno
+      } else {
+        alert.handleAlert("Error al intentar inactivar el espacio de trabajo.", 3, "error");
+      }
+    } catch (error) {
+      console.error("Error al inactivar espacio de trabajo:", error);
+      alert.handleAlert("Error al inactivar el espacio de trabajo", 3, "error");
+    }
+  };
+
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
@@ -108,6 +148,7 @@ const HomePage = () => {
       </Box>
     );
   }
+
   return (
     <Box sx={{ my: 2 }}>
       <Modal
@@ -158,6 +199,7 @@ const HomePage = () => {
         Nuevo espacio de trabajo
       </Button>
       <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
+
       <Grid container spacing={2}>
         {workspaceList &&
           workspaceList?.map((workspace, index) => (
@@ -167,14 +209,18 @@ const HomePage = () => {
                 sx={{ textDecoration: "none" }}
               >
                 <Card sx={{ minHeight: 200, textDecoration: "none" }}>
+
                   <CardContent>
                     <Box
                       sx={{ display: "flex", justifyContent: "flex-end" }}
                     ></Box>
 
-                    <Typography variant="h6">
-                      {workspace.nombre_espacio}
-                    </Typography>
+                <Typography variant="h6">{workspace.nombre_espacio}</Typography>
+                {workspace.propietario === 2 && (
+                  <button onClick={() => handleInactivar(workspace.id_espacio, 1 /* Reemplazar con usuario.id */)}>
+                    Inactivar Espacio de Trabajo
+                  </button>
+                )}
                   </CardContent>
                 </Card>
               </Link>
@@ -190,7 +236,7 @@ HomePage.getLayout = (page: any) => <WorkspaceLayout>{page}</WorkspaceLayout>;
 export default HomePage;
 
 const style = {
-  position: "absolute",
+  position: "absolute" as "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -202,3 +248,4 @@ const style = {
   px: 4,
   pb: 3,
 };
+

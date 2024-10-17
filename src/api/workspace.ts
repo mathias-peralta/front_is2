@@ -38,3 +38,20 @@ export const getAllWorkspaces = async () => {
     return null;
   }
 };
+
+
+export const inactivarEspacio = async (id_espacio: number, propietario: number) => {
+  try {
+    const response = await API.put(`/api/workspaces/${id_espacio}`, {
+      propietario,
+      estado_espacio: "inactivo",
+    });
+
+    if (response.status !== 200) return null;
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al inactivar el espacio de trabajo:", error);
+    return null;
+  }
+};
