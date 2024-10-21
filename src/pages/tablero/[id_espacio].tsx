@@ -1,17 +1,7 @@
-import { getAllWorkspaces, WorkspaceResponse } from "@/api/workspace";
 import { getTablerosByWorkspace, createTablero, TableroResponse } from "../../api/tablero";
 import HomeLayout from "@/layouts/home/layout";
 import AlertContext from "@/providers/alertProvider";
-import {
-  Box,
-  Button,
-  Divider,
-  MenuItem,
-  Modal,
-  TextField,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Button, Divider, MenuItem, Modal, TextField, Typography, CircularProgress } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -22,7 +12,7 @@ import TableRow from "@mui/material/TableRow";
 import { useFormik } from "formik";
 import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { getCurrentUserId } from "../../utils/auth";
+import { useRouter } from "next/router"; // Importar useRouter para obtener el id_espacio
 
 interface FormikProps {
   tableroName: string;
@@ -32,42 +22,26 @@ interface FormikProps {
 const TableroPage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [workspaceList, setWorkspaceList] = useState<WorkspaceResponse[] | null>(null);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<number | null>(null);
   const [tablerosList, setTablerosList] = useState<TableroResponse[] | null>(null);
   const alert = useContext(AlertContext);
+  const router = useRouter();
+  const { id_espacio } = router.query; // Obtener el id_espacio de la URL
 
-  // Cargar espacios de trabajo del usuario
   useEffect(() => {
-    getData();
-  }, []);
-
-  // Obtener tableros cuando se selecciona un espacio de trabajo
-  useEffect(() => {
-    if (selectedWorkspace) {
-      getTableros(selectedWorkspace); // Obtener los tableros asociados
+    if (id_espacio) {
+      getTableros(Number(id_espacio)); // Cargar los tableros cuando se carga el componente
     }
-  }, [selectedWorkspace]);
+  }, [id_espacio]);
 
-  // Obtener los espacios de trabajo
-  const getData = async () => {
-    const userId = Number(getCurrentUserId());
-    const workspaceList = await getAllWorkspaces(userId);
-    setWorkspaceList(workspaceList);
-  };
-
-  // Obtener tableros asociados a un espacio de trabajo
   const getTableros = async (id_espacio: number) => {
     setIsLoading(true);
     const tableros = await getTablerosByWorkspace(id_espacio);
-    setTablerosList(tableros); // Actualizar la lista de tableros
+    setTablerosList(tableros);
     setIsLoading(false);
   };
 
-  // Manejar el modal de creación de tableros
   const handleModal = () => setModalIsOpen(!modalIsOpen);
 
-  // Crear un nuevo tablero
   const handleOnSubmit = async (values: FormikProps) => {
     try {
       setIsLoading(true);
@@ -92,13 +66,11 @@ const TableroPage = () => {
     }
   };
 
-  // Validación de campos
   const validationSchema = Yup.object({
     tableroName: Yup.string().max(255).required("Este campo es requerido"),
     id_espacio: Yup.number().required("Debes seleccionar un espacio de trabajo"),
   });
 
-  // Manejo del formulario
   const {
     values,
     errors,
@@ -109,7 +81,7 @@ const TableroPage = () => {
   } = useFormik<FormikProps>({
     initialValues: {
       tableroName: "",
-      id_espacio: 0,
+      id_espacio: Number(id_espacio),
     },
     validationSchema: validationSchema,
     onSubmit: handleOnSubmit,
@@ -137,33 +109,12 @@ const TableroPage = () => {
             value={values.tableroName}
             sx={{ marginBottom: 1 }}
           />
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Espacio de trabajo"
-            name="id_espacio"
-            value={values.id_espacio}
-            onChange={(event) => {
-              handleChange(event);
-              setSelectedWorkspace(Number(event.target.value)); // Actualiza el workspace seleccionado
-            }}
-            fullWidth
-            sx={{ marginBottom: 1 }}
-            disabled={isLoading}
-          >
-            {workspaceList &&
-              workspaceList.map((item, index) => (
-                <MenuItem key={index} value={item.id_espacio}>
-                  {item.nombre_espacio}
-                </MenuItem>
-              ))}
-          </TextField>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={(e) => {
               e.preventDefault();
               handleSubmit(); // Crear tablero
-            }} 
+            }}
             fullWidth
           >
             Crear
@@ -171,7 +122,7 @@ const TableroPage = () => {
         </Box>
       </Modal>
 
-      <Typography variant="body1">Tableros</Typography>
+      <Typography variant="h4">Tableros del Espacio de Trabajo</Typography>
       <Button variant="contained" size="medium" onClick={handleModal}>
         Nuevo tablero
       </Button>

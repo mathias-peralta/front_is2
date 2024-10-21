@@ -1,9 +1,5 @@
 import { getAllUsers, UsuariosResponse } from "@/api/users";
-import {
-  createWorksPace,
-  getAllWorkspaces,
-  WorkspaceResponse,
-} from "@/api/workspace";
+import { createWorksPace, getAllWorkspaces, WorkspaceResponse } from "@/api/workspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
 import { Add } from "@mui/icons-material";
@@ -24,6 +20,7 @@ import {
 import { useFormik } from "formik";
 import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
+
 interface FormikProps {
   workspaceName: string;
 }
@@ -31,25 +28,25 @@ interface FormikProps {
 const HomePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [workspaceList, setWorkspaceList] = useState<WorkspaceResponse[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const handleOpen = () => setModalIsOpen(true);
-  const handleClose = () => setModalIsOpen(false);
   const alert = useContext(AlertContext);
+
+  const userId = 1; // Simulando el ID del usuario logueado. Reemplázalo con el ID real.
 
   useEffect(() => {
     getUsers();
-    getWorkspaceList();
-  }, []);
+    getWorkspaceList(userId); // Pasamos el userId para obtener los workspaces
+  }, [userId]);
 
-  const getWorkspaceList = async () => {
+  const getWorkspaceList = async (userId: number) => {
     setIsLoading(true);
-    const workspaceList = await getAllWorkspaces();
+    const workspaceList = await getAllWorkspaces(userId); // Llama a getAllWorkspaces con el userId
     setWorkspaceList(workspaceList);
     setIsLoading(false);
   };
+
   const getUsers = async () => {
     setIsLoading(true);
     const response = await getAllUsers();
@@ -61,35 +58,36 @@ const HomePage = () => {
     workspaceName: Yup.string().max(255).required("Este campo es requerido"),
   });
 
-  const handleOnSubmit = async () => {
-    setIsLoading(true);
-    const response = await createWorksPace({
-      nombre_espacio: values.workspaceName,
-      fecha_creacion: new Date(),
-      estado_trabajo: "activo",
-      propietario: 1,
-      descripcion_espacio: "Espacio para realizar tareas",
-    });
-    if (!response) {
-      handleClose();
-      alert.handleAlert(
-        "algo salio mal, intente de nuevo mas tarde",
-        3,
-        "error"
-      );
-      setIsLoading(false);
-      return;
-    }
-    handleClose();
+  const handleOnSubmit = async (values: FormikProps) => {
+    try {
+      setIsLoading(true);
 
-    setIsLoading(false);
+      const response = await createWorksPace({
+        nombre_espacio: values.workspaceName,
+        fecha_creacion: new Date(),
+        estado_espacio: "activo",
+        propietario: userId, // Usa el ID del usuario logueado
+        descripcion_espacio: "Espacio para realizar tareas",
+        miembros: selectedUsers,
+      });
+
+      if (!response) {
+        throw new Error("Error al crear el espacio de trabajo");
+      }
+
+      handleClose();
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      alert.handleAlert("Algo salió mal, intente de nuevo más tarde", 3, "error");
+      setIsLoading(false);
+    }
   };
 
   const {
     values,
     errors,
     touched,
-    setErrors,
     handleChange,
     handleBlur,
     handleSubmit,
@@ -101,6 +99,9 @@ const HomePage = () => {
     onSubmit: handleOnSubmit,
   });
 
+  const handleClose = () => setModalIsOpen(false);
+  const handleOpen = () => setModalIsOpen(true);
+
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
@@ -108,6 +109,7 @@ const HomePage = () => {
       </Box>
     );
   }
+
   return (
     <Box sx={{ my: 2 }}>
       <Modal
@@ -122,11 +124,11 @@ const HomePage = () => {
             error={!!(touched.workspaceName && errors.workspaceName)}
             fullWidth
             helperText={touched.workspaceName && errors.workspaceName}
-            label="Nombre"
-            name="email"
-            onBlur={handleBlur("workspaceName")}
-            onChange={handleChange("workspaceName")}
-            type="email"
+            label="Nombre del espacio"
+            name="workspaceName"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            type="text"
             value={values.workspaceName}
             sx={{ marginBottom: 1 }}
           />
@@ -137,16 +139,25 @@ const HomePage = () => {
             helperText="Por favor selecciona a los usuarios"
             fullWidth
             sx={{ marginBottom: 1 }}
+            SelectProps={{
+              multiple: true,
+            }}
+            value={selectedUsers}
+            onChange={(event) => setSelectedUsers(event.target.value as unknown as number[])}
             disabled={isLoading}
           >
             {users &&
-              users?.map((user, index) => (
+              users.map((user, index) => (
                 <MenuItem key={index} value={user.id_usuario}>
                   {user.correo_usuario}
                 </MenuItem>
               ))}
           </TextField>
-          <Button variant="contained" onClick={handleOnSubmit} fullWidth>
+          <Button 
+            variant="contained" 
+            onClick={() => handleSubmit()} 
+            fullWidth
+          >
             Crear
           </Button>
         </Box>
@@ -160,17 +171,15 @@ const HomePage = () => {
       <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
       <Grid container spacing={2}>
         {workspaceList &&
-          workspaceList?.map((workspace, index) => (
-            <Grid md={4} xs={12}>
+          workspaceList.map((workspace, index) => (
+            <Grid key={index} md={4} xs={12}>
               <Link
                 href={"/espacioDeTrabajos/" + workspace.id_espacio}
                 sx={{ textDecoration: "none" }}
               >
                 <Card sx={{ minHeight: 200, textDecoration: "none" }}>
                   <CardContent>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "flex-end" }}
-                    ></Box>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}></Box>
 
                     <Typography variant="h6">
                       {workspace.nombre_espacio}

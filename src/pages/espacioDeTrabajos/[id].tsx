@@ -1,92 +1,35 @@
 import { getAllUsers, UsuariosResponse } from "@/api/users";
-import {
-  createWorksPace,
-  getAllWorkspaces,
-  WorkspaceResponse,
-} from "@/api/workspace";
+import { getAllWorkspaces, WorkspaceResponse } from "@/api/workspace";
 import HomeLayout from "@/layouts/home/layout";
 import AlertContext from "@/providers/alertProvider";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { useFormik } from "formik";
-import router from "next/router";
+import { Box, CircularProgress, Grid, Typography, Card, CardContent } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import * as Yup from "yup";
-interface FormikProps {
-  workspaceName: string;
-}
+import router from "next/router";
 
 const HomePage = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [workspaceList, setWorkspaceList] = useState<WorkspaceResponse[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const handleOpen = () => setModalIsOpen(true);
-  const handleClose = () => setModalIsOpen(false);
   const alert = useContext(AlertContext);
-  const { id } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
+  const { id } = router.query; // Obtener el parámetro de la URL
+
   useEffect(() => {
-    getUsers();
     getWorkspaceList();
   }, []);
 
+  // Obtener lista de espacios de trabajo
   const getWorkspaceList = async () => {
     setIsLoading(true);
-    const workspaceList = await getAllWorkspaces();
-    setWorkspaceList(workspaceList);
-    setIsLoading(false);
-  };
-  const getUsers = async () => {
-    setIsLoading(true);
-    const response = await getAllUsers();
-    setUsers(response);
-    setIsLoading(false);
-  };
-
-  const validationSchema = Yup.object({
-    workspaceName: Yup.string().max(255).required("Este campo es requerido"),
-  });
-
-  const handleOnSubmit = async () => {
-    setIsLoading(true);
-    const response = await createWorksPace({
-      nombre_espacio: values.workspaceName,
-      fecha_creacion: new Date(),
-      estado_trabajo: "activo",
-      propietario: 1,
-      descripcion_espacio: "Espacio para realizar tareas",
-    });
-    if (!response) {
-      handleClose();
-      alert.handleAlert(
-        "algo salio mal, intente de nuevo mas tarde",
-        3,
-        "error"
-      );
-      setIsLoading(false);
-      return;
+    if (id) {
+      const workspaceList = await getAllWorkspaces(Number(id));
+      setWorkspaceList(workspaceList);
     }
-    handleClose();
-
     setIsLoading(false);
   };
 
-  const {
-    values,
-    errors,
-    touched,
-    setErrors,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-  } = useFormik<FormikProps>({
-    initialValues: {
-      workspaceName: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: handleOnSubmit,
-  });
+  // Redirigir al usuario a la página de tableros
+  const handleWorkspaceClick = (id_espacio: number) => {
+    router.push(`/tablero/${id_espacio}`); // Redirige a la página de tableros
+  };
 
   if (isLoading) {
     return (
@@ -95,27 +38,26 @@ const HomePage = () => {
       </Box>
     );
   }
+
   return (
-    <>
-      <Typography>Hola,{id}</Typography>
-    </>
+    <Box>
+      <Typography variant="h4">Espacios de trabajo</Typography>
+      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+        {workspaceList?.map((workspace) => (
+          <Grid item xs={12} sm={6} md={4} key={workspace.id_espacio}>
+            <Card sx={{ cursor: 'pointer' }} onClick={() => handleWorkspaceClick(workspace.id_espacio)}>
+              <CardContent>
+                <Typography variant="h5">{workspace.nombre_espacio}</Typography>
+                <Typography variant="body2">{workspace.descripcion_espacio}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
 HomePage.getLayout = (page: any) => <HomeLayout>{page}</HomeLayout>;
 
 export default HomePage;
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};

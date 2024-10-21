@@ -5,7 +5,8 @@ interface WorkspaceData {
   descripcion_espacio: string;
   nombre_espacio: string;
   fecha_creacion: Date;
-  estado_trabajo: string;
+  miembros: number[]; // Array de IDs de usuarios para miembros
+  estado_espacio: string;
 }
 export const createWorksPace = async (data: WorkspaceData) => {
   try {
@@ -18,6 +19,7 @@ export const createWorksPace = async (data: WorkspaceData) => {
     return null;
   }
 };
+
 export interface WorkspaceResponse {
   id_espacio: number;
   propietario: number;
@@ -27,9 +29,9 @@ export interface WorkspaceResponse {
   estado_espacio: string;
 }
 
-export const getAllWorkspaces = async () => {
+export const getAllWorkspaces = async (userId: number) => {
   try {
-    const workspace = await API.get<WorkspaceResponse[]>("/api/workspaces");
+    const workspace = await API.get<WorkspaceResponse[]>(`/api/workspaces_all/${userId}`);
 
     if (workspace.status !== 200) return null;
 
