@@ -1,5 +1,6 @@
 import { getAllUsers, UsuariosResponse } from "@/api/users";
 import {
+  addWorkspace,
   createWorksPace,
   getAllWorkspaces,
   updateWorkspace,
@@ -37,7 +38,7 @@ import * as Yup from "yup";
 
 interface FormikProps {
   workspaceName: string;
-  userList: UsuariosResponse[];
+  userList: string[];
 }
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -49,19 +50,6 @@ const MenuProps = {
     },
   },
 };
-
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
-];
 
 const HomePage = () => {
   const theme = useTheme();
@@ -79,15 +67,16 @@ const HomePage = () => {
 
   const [personName, setPersonName] = useState<string[]>([]);
 
-  const handleChangeUser = (event: SelectChangeEvent<typeof personName>) => {
+  const handleChangeUser = (
+    event: SelectChangeEvent<typeof values.userList>
+  ) => {
     const {
       target: { value },
     } = event;
-    console.log({ value });
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    setValues({
+      ...values,
+      userList: typeof value === "string" ? value.split(",") : value,
+    });
   };
 
   useEffect(() => {
@@ -97,6 +86,7 @@ const HomePage = () => {
 
   const getWorkspaceList = async () => {
     setIsLoading(true);
+
     const workspaceList = await getAllWorkspaces();
 
     setWorkspaceList(workspaceList);
@@ -112,11 +102,17 @@ const HomePage = () => {
 
   const validationSchema = Yup.object({
     workspaceName: Yup.string().max(255).required("Este campo es requerido"),
+    userList: Yup.array()
+      .of(Yup.string()) // Asegurar que los elementos del array sean strings
+      .min(1, "Debe haber al menos un tag"), // Validar que el array tenga al menos 1
   });
 
   const handleOnSubmit = async () => {
-    console.log({ values });
-    return;
+    const userIds = values.userList.map((email) => {
+      const user = users?.find((user) => user.correo_usuario === email);
+      return user ? user.id_usuario : null; // Retorna el id si se encuentra, o null si no existe
+    });
+    console.log({ userIds });
     setIsLoading(true);
     const response = await createWorksPace({
       nombre_espacio: values.workspaceName,
@@ -136,7 +132,13 @@ const HomePage = () => {
       setIsLoading(false);
       return;
     }
-
+    userIds?.map((userId) => {
+      addWorkspace({
+        id_usuario: userId || 0,
+        id_espacio: response.workspace.id_espacio,
+      });
+    });
+    getWorkspaceList();
     handleClose();
     setIsLoading(false);
   };
@@ -207,26 +209,31 @@ const HomePage = () => {
             sx={{ marginBottom: 1 }}
           />
           <FormControl sx={{ marginBottom: 1 }} fullWidth>
-            <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">
+              Integrantes
+            </InputLabel>
             <Select
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               multiple
-              value={personName}
+              value={values.userList}
               onChange={handleChangeUser}
-              input={<OutlinedInput label="Tag" />}
+              input={<OutlinedInput label="Integrantes" />}
               renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
+              error={!!(touched.userList && errors.userList)}
             >
-              {names.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={personName.includes(name)} />
-                  <ListItemText primary={name} />
+              {users?.map((user) => (
+                <MenuItem key={user.id_usuario} value={user.correo_usuario}>
+                  <Checkbox
+                    checked={values.userList.includes(user.correo_usuario)}
+                  />
+                  <ListItemText primary={user.correo_usuario} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button variant="contained" onClick={handleOnSubmit} fullWidth>
+          <Button variant="contained" onClick={() => handleSubmit()} fullWidth>
             Crear
           </Button>
         </Box>

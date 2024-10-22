@@ -35,18 +35,10 @@ export const createWorksPace = async (data: WorkspaceData) => {
     return null;
   }
 };
-export interface WorkspaceResponse {
-  id_espacio: number;
-  propietario: number;
-  descripcion_espacio: string;
-  nombre_espacio: string;
-  fecha_creacion: Date;
-  estado_espacio: string;
-}
 
 export const getAllWorkspaces = async () => {
   try {
-    const workspace = await API.get<WorkspaceResponse[]>("/api/workspaces");
+    const workspace = await API.get<Workspace[]>("/api/workspaces");
 
     if (workspace.status !== 200) return null;
 
@@ -70,6 +62,26 @@ export const updateWorkspace = async ({
       {
         estado_espacio: estado_espacio,
       }
+    );
+
+    if (workspace.status !== 200) return null;
+
+    return workspace.data;
+  } catch {
+    return null;
+  }
+};
+
+interface AddWorkspaceDto {
+  id_usuario: number;
+  id_espacio: number;
+}
+export const addWorkspace = async (data: AddWorkspaceDto) => {
+  try {
+    console.log({ data });
+    const workspace = await API.post<WorkspaceResponse[]>(
+      "/api/workspaces/miembros/",
+      data
     );
 
     if (workspace.status !== 200) return null;
