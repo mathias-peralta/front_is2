@@ -14,18 +14,19 @@ import {
   Card,
   CardActions,
   CardContent,
+  Checkbox,
   CircularProgress,
   Divider,
   FormControl,
   Grid,
   InputLabel,
+  ListItemText,
   MenuItem,
   Modal,
   OutlinedInput,
   Select,
   SelectChangeEvent,
   TextField,
-  Theme,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -49,17 +50,18 @@ const MenuProps = {
   },
 };
 
-function getStyles(
-  user: UsuariosResponse,
-  users: UsuariosResponse[],
-  theme: Theme
-) {
-  return {
-    fontWeight: users.includes(user)
-      ? theme.typography.fontWeightMedium
-      : theme.typography.fontWeightRegular,
-  };
-}
+const names = [
+  "Oliver Hansen",
+  "Van Henry",
+  "April Tucker",
+  "Ralph Hubbard",
+  "Omar Alexander",
+  "Carlos Abbott",
+  "Miriam Wagner",
+  "Bradley Wilkerson",
+  "Virginia Andrews",
+  "Kelly Snyder",
+];
 
 const HomePage = () => {
   const theme = useTheme();
@@ -75,17 +77,19 @@ const HomePage = () => {
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
 
-  const handleChange2 = (event: SelectChangeEvent<typeof values.userList>) => {
+  const [personName, setPersonName] = useState<string[]>([]);
+
+  const handleChangeUser = (event: SelectChangeEvent<typeof personName>) => {
     const {
-      target: { value, name },
+      target: { value },
     } = event;
     console.log({ value });
-
-    setValues({
-      ...values,
-      userList: typeof value === "string" ? value.split(",") : value,
-    });
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
   };
+
   useEffect(() => {
     getUsers();
     getWorkspaceList();
@@ -203,24 +207,21 @@ const HomePage = () => {
             sx={{ marginBottom: 1 }}
           />
           <FormControl sx={{ marginBottom: 1 }} fullWidth>
-            <InputLabel id="demo-multiple-name-label">Name</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
             <Select
-              labelId="demo-multiple-name-label"
-              id="demo-multiple-name"
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
               multiple
-              value={values.userList}
-              onChange={(item) => console.log("item", item)}
-              input={<OutlinedInput label="Name" />}
+              value={personName}
+              onChange={handleChangeUser}
+              input={<OutlinedInput label="Tag" />}
+              renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
             >
-              {users?.map((user) => (
-                <MenuItem
-                  key={user.id_usuario}
-                  value={user.id_usuario}
-                  style={getStyles(user, values.userList, theme)}
-                  onClick={() => console.log(user)}
-                >
-                  {user.correo_usuario}
+              {names.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={personName.includes(name)} />
+                  <ListItemText primary={name} />
                 </MenuItem>
               ))}
             </Select>
