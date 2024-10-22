@@ -94,7 +94,7 @@ const HomePage = () => {
   const getWorkspaceList = async () => {
     setIsLoading(true);
     const workspaceList = await getAllWorkspaces();
-    getWorkspaceList();
+
     setWorkspaceList(workspaceList);
     setIsLoading(false);
   };
