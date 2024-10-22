@@ -2,8 +2,8 @@ import { getAllUsers, UsuariosResponse } from "@/api/users";
 import {
   createWorksPace,
   getAllWorkspaces,
+  updateWorkspace,
   WorkspaceResponse,
-  inactivarEspacio, // Función para inactivar espacios
 } from "@/api/workspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
@@ -12,34 +12,80 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardContent,
   CircularProgress,
   Divider,
+  FormControl,
   Grid,
-  Link,
+  InputLabel,
   MenuItem,
   Modal,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
   TextField,
+  Theme,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useFormik } from "formik";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
 
 interface FormikProps {
   workspaceName: string;
+  userList: UsuariosResponse[];
+}
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(
+  user: UsuariosResponse,
+  users: UsuariosResponse[],
+  theme: Theme
+) {
+  return {
+    fontWeight: users.includes(user)
+      ? theme.typography.fontWeightMedium
+      : theme.typography.fontWeightRegular,
+  };
 }
 
 const HomePage = () => {
+  const theme = useTheme();
+  const router = useRouter();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<WorkspaceResponse[] | null>(null);
+  const [workspaceList, setWorkspaceList] = useState<
+    WorkspaceResponse[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const alert = useContext(AlertContext);
 
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
 
+  const handleChange2 = (event: SelectChangeEvent<typeof values.userList>) => {
+    const {
+      target: { value, name },
+    } = event;
+    console.log({ value });
+
+    setValues({
+      ...values,
+      userList: typeof value === "string" ? value.split(",") : value,
+    });
+  };
   useEffect(() => {
     getUsers();
     getWorkspaceList();
@@ -65,6 +111,8 @@ const HomePage = () => {
   });
 
   const handleOnSubmit = async () => {
+    console.log({ values });
+    return;
     setIsLoading(true);
     const response = await createWorksPace({
       nombre_espacio: values.workspaceName,
@@ -76,7 +124,11 @@ const HomePage = () => {
 
     if (!response) {
       handleClose();
-      alert.handleAlert("Algo salió mal, intente de nuevo más tarde", 3, "error");
+      alert.handleAlert(
+        "Algo salió mal, intente de nuevo más tarde",
+        3,
+        "error"
+      );
       setIsLoading(false);
       return;
     }
@@ -89,29 +141,23 @@ const HomePage = () => {
     values,
     errors,
     touched,
+    setValues,
+    setErrors,
     handleChange,
     handleBlur,
     handleSubmit,
   } = useFormik<FormikProps>({
     initialValues: {
       workspaceName: "",
+      userList: [],
     },
     validationSchema: validationSchema,
     onSubmit: handleOnSubmit,
   });
 
-  const handleInactivar = async (id_espacio: number, id_usuario: number) => {
-    const resultado = await inactivarEspacio(id_espacio, id_usuario);
-
-    if (resultado) {
-      alert.handleAlert("Espacio de trabajo inactivado con éxito.", 3, "success");
-      // Actualiza la lista de espacios de trabajo
-      getWorkspaceList();
-    } else {
-      alert.handleAlert("Error al intentar inactivar el espacio de trabajo.", 3, "error");
-    }
+  const handleNavigate = (id: number) => {
+    router.push("/espacioDeTrabajos/[id]", `/espacioDeTrabajos/${id}`);
   };
-
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
@@ -119,6 +165,20 @@ const HomePage = () => {
       </Box>
     );
   }
+
+  const handleDesactivateWorkSpace = async (id: number) => {
+    setIsLoading(true);
+    const updateResponse = await updateWorkspace({
+      id,
+      estado_espacio: "inactivo",
+    });
+
+    if (updateResponse) {
+      await getWorkspaceList();
+    }
+
+    setIsLoading(false);
+  };
 
   return (
     <Box sx={{ my: 2 }}>
@@ -142,22 +202,29 @@ const HomePage = () => {
             value={values.workspaceName}
             sx={{ marginBottom: 1 }}
           />
-          <TextField
-            id="outlined-select-currency"
-            select
-            label="Integrantes"
-            helperText="Por favor selecciona a los usuarios"
-            fullWidth
-            sx={{ marginBottom: 1 }}
-            disabled={isLoading}
-          >
-            {users &&
-              users.map((user, index) => (
-                <MenuItem key={index} value={user.id_usuario}>
+          <FormControl sx={{ marginBottom: 1 }} fullWidth>
+            <InputLabel id="demo-multiple-name-label">Name</InputLabel>
+            <Select
+              labelId="demo-multiple-name-label"
+              id="demo-multiple-name"
+              multiple
+              value={values.userList}
+              onChange={(item) => console.log("item", item)}
+              input={<OutlinedInput label="Name" />}
+              MenuProps={MenuProps}
+            >
+              {users?.map((user) => (
+                <MenuItem
+                  key={user.id_usuario}
+                  value={user.id_usuario}
+                  style={getStyles(user, values.userList, theme)}
+                  onClick={() => console.log(user)}
+                >
                   {user.correo_usuario}
                 </MenuItem>
               ))}
-          </TextField>
+            </Select>
+          </FormControl>
           <Button variant="contained" onClick={handleOnSubmit} fullWidth>
             Crear
           </Button>
@@ -171,24 +238,41 @@ const HomePage = () => {
         Nuevo espacio de trabajo
       </Button>
       <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
-
       <Grid container spacing={2}>
-        {workspaceList?.map((workspace) => (
-          <Grid key={workspace.id_espacio} md={4} xs={12}>
-            <Card sx={{ minHeight: 200, textDecoration: "none" }}>
-              <CardContent>
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}></Box>
+        {workspaceList &&
+          workspaceList?.map((workspace, index) => (
+            <Grid md={4} xs={12}>
+              <Card sx={{ minHeight: 200, textDecoration: "none" }}>
+                <CardContent>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "flex-end" }}
+                  ></Box>
 
-                <Typography variant="h6">{workspace.nombre_espacio}</Typography>
-                {workspace.propietario === 1 /* Reemplazar con usuario.id cuando esté disponible */ && (
-                  <button onClick={() => handleInactivar(workspace.id_espacio, 1 /* Reemplazar con usuario.id */)}>
-                    Inactivar Espacio de Trabajo
-                  </button>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                  <Typography variant="h6">
+                    {workspace.nombre_espacio}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="medium"
+                    variant="outlined"
+                    onClick={() =>
+                      handleDesactivateWorkSpace(workspace.id_espacio)
+                    }
+                  >
+                    Desactivar
+                  </Button>
+                  <Button
+                    size="medium"
+                    variant="contained"
+                    onClick={() => handleNavigate(workspace.id_espacio)}
+                  >
+                    Ingresar
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
     </Box>
   );
@@ -211,5 +295,3 @@ const style = {
   px: 4,
   pb: 3,
 };
-
-

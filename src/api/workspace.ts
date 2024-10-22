@@ -7,9 +7,26 @@ interface WorkspaceData {
   fecha_creacion: Date;
   estado_trabajo: string;
 }
+export interface WorkspaceResponse {
+  message: string;
+  workspace: Workspace;
+}
+
+export interface Workspace {
+  id_espacio: number;
+  propietario: number;
+  descripcion_espacio: string;
+  nombre_espacio: string;
+  fecha_creacion: Date;
+  estado_espacio: null;
+}
+
 export const createWorksPace = async (data: WorkspaceData) => {
   try {
-    const workspace = await API.post("/api/workspaces", data);
+    const workspace = await API.post<WorkspaceResponse>(
+      "/api/workspaces",
+      data
+    );
 
     if (workspace.status !== 201) return null;
 
@@ -39,19 +56,26 @@ export const getAllWorkspaces = async () => {
   }
 };
 
-
-export const inactivarEspacio = async (id_espacio: number, propietario: number) => {
+interface UpdateWorkspaceDto {
+  id: number;
+  estado_espacio: "activo" | "inactivo";
+}
+export const updateWorkspace = async ({
+  id,
+  estado_espacio,
+}: UpdateWorkspaceDto) => {
   try {
-    const response = await API.put(`/api/workspaces/${id_espacio}`, {
-      propietario,
-      estado_espacio: "inactivo",
-    });
+    const workspace = await API.put<WorkspaceResponse[]>(
+      "/api/workspaces/" + id,
+      {
+        estado_espacio: estado_espacio,
+      }
+    );
 
-    if (response.status !== 200) return null;
+    if (workspace.status !== 200) return null;
 
-    return response.data;
-  } catch (error) {
-    console.error("Error al inactivar el espacio de trabajo:", error);
+    return workspace.data;
+  } catch {
     return null;
   }
 };
