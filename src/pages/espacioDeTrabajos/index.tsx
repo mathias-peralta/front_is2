@@ -114,7 +114,6 @@ const HomePage = () => {
       const user = users?.find((user) => user.correo_usuario === email);
       return user ? user.id_usuario : null; // Retorna el id si se encuentra, o null si no existe
     });
-    console.log({ userIds });
     setIsLoading(true);
     const response = await createWorksPace({
       nombre_espacio: values.workspaceName,
@@ -164,7 +163,7 @@ const HomePage = () => {
   });
 
   const handleNavigate = (id: number) => {
-    router.push("/espacioDeTrabajos/[id]", `/espacioDeTrabajos/${id}`);
+    router.push("/espacioDeTrabajos/[param1]", `/espacioDeTrabajos/${id}`);
   };
   if (isLoading) {
     return (

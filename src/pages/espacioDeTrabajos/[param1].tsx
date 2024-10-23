@@ -38,7 +38,7 @@ const HomePage = () => {
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
   const alert = useContext(AlertContext);
-  const { id } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
+  const { param1 } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
 
   useEffect(() => {
     getAllTablerosById();
@@ -46,13 +46,13 @@ const HomePage = () => {
 
   const getAllTablerosById = async () => {
     setIsLoading(true);
-    const tableroResponse = await getTablerosByWorkspace(id ? +id : 0);
+    const tableroResponse = await getTablerosByWorkspace(param1 ? +param1 : 0);
     setTableroList(tableroResponse);
     setIsLoading(false);
   };
 
-  const handleNavigate = (id: number) => {
-    router.push(`/tablero/${id}`);
+  const handleNavigate = (param2: number) => {
+    router.push(`/espacioDeTrabajos/${param1}/${param2}`);
   };
 
   const validationSchema = Yup.object({
@@ -62,7 +62,7 @@ const HomePage = () => {
   const handleOnSubmit = async () => {
     setIsLoading(true);
     const response = await createTableroByWorkspace({
-      id_espacio: id ? +id : 0,
+      id_espacio: param1 ? +param1 : 0,
       nombre_tablero: values.tableroName,
     });
     if (!response) {
