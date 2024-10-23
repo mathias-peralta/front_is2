@@ -36,9 +36,9 @@ export const createWorksPace = async (data: WorkspaceData) => {
   }
 };
 
-export const getAllWorkspaces = async () => {
+export const getAllWorkspacesById = async (id: number) => {
   try {
-    const workspace = await API.get<Workspace[]>("/api/workspaces");
+    const workspace = await API.get<Workspace[]>("/api/workspaces_all/" + id);
 
     if (workspace.status !== 200) return null;
 

@@ -1,4 +1,4 @@
-import { getAllWorkspaces, WorkspaceResponse } from "@/api/workspace";
+import { getAllWorkspacesById, WorkspaceResponse } from "@/api/workspace";
 import HomeLayout from "@/layouts/home/layout";
 import AlertContext from "@/providers/alertProvider";
 import {
@@ -49,7 +49,7 @@ const TableroPage = () => {
   }, []);
 
   const getData = async () => {
-    const workspaceList = await getAllWorkspaces();
+    const workspaceList = await getAllWorkspacesById();
     setWorkspaceList(workspaceList);
   };
 

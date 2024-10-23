@@ -58,7 +58,7 @@ const AuthLoginPage = (params: any) => {
       );
 
       // Redirigir al home
-      router.push("/");
+      router.push("/espacioDeTrabajos");
     } catch (error) {
       // Mostrar un mensaje de error en caso de que el login falle
       alert.handleAlert(

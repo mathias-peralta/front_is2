@@ -2,12 +2,14 @@ import { getAllUsers, UsuariosResponse } from "@/api/users";
 import {
   addWorkspace,
   createWorksPace,
-  getAllWorkspaces,
+  getAllWorkspacesById,
   updateWorkspace,
-  WorkspaceResponse,
+  Workspace,
 } from "@/api/workspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
+import { selectUser } from "@/redux/features/userSlice";
+import { RootState } from "@/redux/store";
 import { Add } from "@mui/icons-material";
 import {
   Box,
@@ -34,6 +36,7 @@ import {
 import { useFormik } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import * as Yup from "yup";
 
 interface FormikProps {
@@ -56,11 +59,10 @@ const HomePage = () => {
   const router = useRouter();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [workspaceList, setWorkspaceList] = useState<Workspace[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const alert = useContext(AlertContext);
+  const user = useSelector((state: RootState) => selectUser(state.userState));
 
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
@@ -87,7 +89,7 @@ const HomePage = () => {
   const getWorkspaceList = async () => {
     setIsLoading(true);
 
-    const workspaceList = await getAllWorkspaces();
+    const workspaceList = await getAllWorkspacesById(user?.id_usuario || 0);
 
     setWorkspaceList(workspaceList);
     setIsLoading(false);
@@ -118,7 +120,7 @@ const HomePage = () => {
       nombre_espacio: values.workspaceName,
       fecha_creacion: new Date(),
       estado_trabajo: "activo",
-      propietario: 1, // Actualizar esto para el usuario propietario
+      propietario: user?.id_usuario || 0, // Actualizar esto para el usuario propietario
       descripcion_espacio: "Espacio para realizar tareas",
     });
 

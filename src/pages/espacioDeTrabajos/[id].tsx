@@ -1,12 +1,16 @@
-import { getAllUsers, UsuariosResponse } from "@/api/users";
-import {
-  createWorksPace,
-  getAllWorkspaces,
-  WorkspaceResponse,
-} from "@/api/workspace";
+import { getTablerosByWorkspace } from "@/api/tableros";
+import { UsuariosResponse } from "@/api/users";
+import { createWorksPace } from "@/api/workspace";
 import HomeLayout from "@/layouts/home/layout";
 import AlertContext from "@/providers/alertProvider";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
 import { useFormik } from "formik";
 import router from "next/router";
 import { useContext, useEffect, useState } from "react";
@@ -18,29 +22,21 @@ interface FormikProps {
 const HomePage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [users, setUsers] = useState<UsuariosResponse[] | null>(null);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [tableroList, setTableroList] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
   const alert = useContext(AlertContext);
   const { id } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
+
   useEffect(() => {
-    getUsers();
-    getWorkspaceList();
+    getAllTablerosById();
   }, []);
 
-  const getWorkspaceList = async () => {
+  const getAllTablerosById = async () => {
     setIsLoading(true);
-    const workspaceList = await getAllWorkspaces();
-    setWorkspaceList(workspaceList);
-    setIsLoading(false);
-  };
-  const getUsers = async () => {
-    setIsLoading(true);
-    const response = await getAllUsers();
-    setUsers(response);
+    const tableroResponse = await getTablerosByWorkspace(id ? +id : 0);
+    setTableroList(tableroResponse);
     setIsLoading(false);
   };
 
@@ -97,7 +93,13 @@ const HomePage = () => {
   }
   return (
     <>
-      <Typography>Hola,{id}</Typography>
+      <Typography variant="h3" sx={{ marginBottom: 2 }}>
+        Tableros
+      </Typography>
+      <Button variant="contained" onClick={handleOpen} endIcon={<Add />}>
+        Nuevo tablero
+      </Button>
+      <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
     </>
   );
 };
