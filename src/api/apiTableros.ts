@@ -1,10 +1,6 @@
 import API from "@/config/API";
-
-export interface TableroResponse {
-  id_tablero: number;
-  id_espacio: number;
-  nombre_tablero: string;
-}
+import { CreateTableroDto } from "@/models/dto/tablero.dto";
+import { TableroResponse } from "@/models/response/tableroResponse";
 
 export const getTablerosByWorkspace = async (idEspacio: number) => {
   try {
@@ -19,11 +15,6 @@ export const getTablerosByWorkspace = async (idEspacio: number) => {
     return null;
   }
 };
-
-interface CreateTableroDto {
-  id_espacio: number;
-  nombre_tablero: string;
-}
 
 export const createTableroByWorkspace = async (data: CreateTableroDto) => {
   try {

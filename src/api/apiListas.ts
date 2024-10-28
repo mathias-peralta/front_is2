@@ -1,4 +1,5 @@
 import API from "@/config/API";
+import { CrearListaDto } from "@/models/dto/listas.dto";
 
 export const getListById = async (idLista: number) => {
   try {
@@ -8,13 +9,6 @@ export const getListById = async (idLista: number) => {
   }
 };
 
-interface CrearListaDto {
-  id_tablero: number;
-  nombre_lista: string;
-  orden: number;
-  max_tareas: number;
-  estado: string;
-}
 export const crearLista = async (data: CrearListaDto) => {
   try {
     const listResponse = await API.post("/api/listas/", data);

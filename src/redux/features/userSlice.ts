@@ -1,4 +1,4 @@
-import { UsuariosResponse } from "@/api/users";
+import { UsuariosResponse } from "@/api/apiUsers";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type userState = {

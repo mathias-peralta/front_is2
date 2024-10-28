@@ -1,4 +1,4 @@
-import { getUserById } from "@/api/users";
+import { getUserById } from "@/api/apiUsers";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import { setToken } from "@/redux/features/authSlice";

@@ -1,11 +1,11 @@
-import { getAllUsers, UsuariosResponse } from "@/api/users";
+import { getAllUsers, UsuariosResponse } from "@/api/apiUsers";
 import {
   addWorkspace,
   createWorksPace,
   getAllWorkspacesById,
   updateWorkspace,
   Workspace,
-} from "@/api/workspace";
+} from "@/api/apiWorkspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
 import AlertContext from "@/providers/alertProvider";
 import { selectUser } from "@/redux/features/userSlice";

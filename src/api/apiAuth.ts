@@ -1,11 +1,7 @@
 import API from "@/config/API";
+import { LoginUser, RegisterUser } from "@/models/dto/auth.dto";
+import { LoginResponse } from "@/pages/api/login";
 
-export interface RegisterUser {
-  correo_usuario: string;
-  password_usuario: string;
-  nombre_usuario: string;
-  apellido_usuario: string;
-}
 export const registerUser = async (userData: RegisterUser) => {
   try {
     const response = await API.post("/api/auth/register", userData);
@@ -17,15 +13,6 @@ export const registerUser = async (userData: RegisterUser) => {
     return null;
   }
 };
-
-export interface LoginUser {
-  correo_usuario: string;
-  password_usuario: string;
-}
-export interface LoginResponse {
-  token: string;
-  message: string;
-}
 
 export const loginUser = async (userData: LoginUser) => {
   try {
