@@ -1,10 +1,10 @@
 import {
   createTableroByWorkspace,
   getTablerosByWorkspace,
-  TableroResponse,
 } from "@/api/apiTableros";
 import { UsuariosResponse } from "@/api/apiUsers";
 import HomeLayout from "@/layouts/home/layout";
+import { TableroResponse } from "@/models/response/tableroResponse";
 import AlertContext from "@/providers/alertProvider";
 import { Add, ArrowRightAlt } from "@mui/icons-material";
 import {

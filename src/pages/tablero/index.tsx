@@ -1,5 +1,6 @@
-import { getAllWorkspacesById, WorkspaceResponse } from "@/api/apiWorkspace";
+import { getAllWorkspacesById } from "@/api/apiWorkspace";
 import HomeLayout from "@/layouts/home/layout";
+import { WorkspaceResponse } from "@/models/response/workspaceResponse";
 import AlertContext from "@/providers/alertProvider";
 import {
   Alert,

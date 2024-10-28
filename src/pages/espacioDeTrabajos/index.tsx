@@ -4,9 +4,9 @@ import {
   createWorksPace,
   getAllWorkspacesById,
   updateWorkspace,
-  Workspace,
 } from "@/api/apiWorkspace";
 import WorkspaceLayout from "@/layouts/worspace/layout";
+import { Workspace } from "@/models/response/workspaceResponse";
 import AlertContext from "@/providers/alertProvider";
 import { selectUser } from "@/redux/features/userSlice";
 import { RootState } from "@/redux/store";
