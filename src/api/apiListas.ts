@@ -48,3 +48,17 @@ export const getListByIdTablero = async (idTablero: number) => {
     return null;
   }
 };
+
+export const deleteByIdLista = async (idLista: number) => {
+  try {
+    const listResponse = await API.delete<ListasByIDTableroResponse[]>(
+      "/api/listas/" + idLista
+    );
+
+    if (listResponse.status !== 200) return null;
+
+    return true;
+  } catch {
+    return null;
+  }
+};

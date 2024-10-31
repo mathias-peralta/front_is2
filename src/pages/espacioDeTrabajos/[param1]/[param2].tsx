@@ -1,4 +1,8 @@
-import { crearLista, getListByIdTablero } from "@/api/apiListas";
+import {
+  crearLista,
+  deleteByIdLista,
+  getListByIdTablero,
+} from "@/api/apiListas";
 import HomeLayout from "@/layouts/home/layout";
 import { ListasByIDTableroResponse } from "@/models/response/listaResponse";
 import AlertContext from "@/providers/alertProvider";
@@ -32,12 +36,15 @@ interface FormikProps {
 
 const ListPage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalEditIsOpen, setModalEditIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [listas, setListas] = useState<ListasByIDTableroResponse[] | null>(
     null
   );
+  const [listaSeleccionada, setListaSeleccionada] =
+    useState<ListasByIDTableroResponse | null>(null);
   const alert = useContext(AlertContext);
-  const { param1, param2 } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
+  const { param2 } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
 
   useEffect(() => {
     getListas();
@@ -52,8 +59,29 @@ const ListPage = () => {
 
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
+
+  const handleOpenModalEdit = () => setModalEditIsOpen(true);
+  const handleCloseModalEdit = () => setModalEditIsOpen(false);
+
   const handleNavigate = (id: number) => {};
 
+  const handleDeleteList = async () => {
+    setIsLoading(true);
+    handleCloseModalEdit();
+    const deleteLista = await deleteByIdLista(
+      listaSeleccionada ? listaSeleccionada.id_lista : 0
+    );
+    if (!deleteLista) {
+      alert.handleAlert(
+        "No se pudo eliminar la lista, intente de nuevo mas tarde",
+        3,
+        "error"
+      );
+      setIsLoading(false);
+      return;
+    }
+    getListas();
+  };
   const validationSchema = Yup.object({
     listName: Yup.string().max(255).required("Este campo es requerido"),
     listMaxLength: Yup.string().max(255).required("Este campo es requerido"),
@@ -150,6 +178,38 @@ const ListPage = () => {
           </Button>
         </Box>
       </Modal>
+      <Modal
+        open={modalEditIsOpen}
+        onClose={handleCloseModalEdit}
+        aria-labelledby="parent-modal-title"
+        aria-describedby="parent-modal-description"
+      >
+        <Box sx={{ ...style, width: 400 }}>
+          <Typography variant="h6">Editar Lista</Typography>
+          <TextField
+            fullWidth
+            label="Nombre"
+            name="Nombre"
+            onBlur={handleBlur("listName")}
+            onChange={handleChange("listName")}
+            type="Nombre"
+            value={listaSeleccionada ? listaSeleccionada?.nombre_lista : ""}
+            sx={{ marginBottom: 1 }}
+          />
+
+          <Button
+            variant="outlined"
+            onClick={handleDeleteList}
+            sx={{ mb: 1 }}
+            fullWidth
+          >
+            eliminar
+          </Button>
+          <Button variant="contained" onClick={() => handleSubmit()} fullWidth>
+            actualizar
+          </Button>
+        </Box>
+      </Modal>
       <Typography variant="h3" sx={{ marginBottom: 2 }}>
         Listas
       </Typography>
@@ -172,7 +232,10 @@ const ListPage = () => {
                     {item.nombre_lista}
                     <IconButton
                       aria-label="delete"
-                      onClick={() => console.log(item)}
+                      onClick={() => {
+                        setListaSeleccionada(item);
+                        handleOpenModalEdit();
+                      }}
                     >
                       <EditIcon />
                     </IconButton>
