@@ -11,3 +11,10 @@ export interface Workspace {
   fecha_creacion: Date;
   estado_espacio: null;
 }
+
+export interface UsersByWorkspaceIDResponse {
+  id_usuario: number;
+  nombre_usuario: string;
+  apellido_usuario: string;
+  correo_usuario: string;
+}

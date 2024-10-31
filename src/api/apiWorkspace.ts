@@ -5,6 +5,7 @@ import {
   WorkspaceDto,
 } from "@/models/dto/workspace.dto";
 import {
+  UsersByWorkspaceIDResponse,
   Workspace,
   WorkspaceResponse,
 } from "@/models/response/workspaceResponse";
@@ -61,6 +62,20 @@ export const addWorkspace = async (data: AddWorkspaceDto) => {
     const workspace = await API.post<WorkspaceResponse[]>(
       "/api/workspaces/miembros/",
       data
+    );
+
+    if (workspace.status !== 200) return null;
+
+    return workspace.data;
+  } catch {
+    return null;
+  }
+};
+
+export const getUsersByWorkspaceId = async (idWorkspace: number) => {
+  try {
+    const workspace = await API.get<UsersByWorkspaceIDResponse[]>(
+      "/api/workspaces/miembros/" + idWorkspace
     );
 
     if (workspace.status !== 200) return null;
