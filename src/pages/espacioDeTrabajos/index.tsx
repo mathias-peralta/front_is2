@@ -262,15 +262,18 @@ const HomePage = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button
-                    size="medium"
-                    variant="outlined"
-                    onClick={() =>
-                      handleDesactivateWorkSpace(workspace.id_espacio)
-                    }
-                  >
-                    Desactivar
-                  </Button>
+                  {workspace.propietario === user?.id_usuario && (
+                    <Button
+                      size="medium"
+                      variant="outlined"
+                      onClick={() =>
+                        handleDesactivateWorkSpace(workspace.id_espacio)
+                      }
+                    >
+                      Desactivar
+                    </Button>
+                  )}
+
                   <Button
                     size="medium"
                     variant="contained"
