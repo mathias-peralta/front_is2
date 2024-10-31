@@ -1,4 +1,4 @@
-import { getUserById } from "@/api/users";
+import { getUserById } from "@/api/apiUsers";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import { setToken } from "@/redux/features/authSlice";
@@ -58,7 +58,7 @@ const AuthLoginPage = (params: any) => {
       );
 
       // Redirigir al home
-      router.push("/");
+      router.push("/espacioDeTrabajos");
     } catch (error) {
       // Mostrar un mensaje de error en caso de que el login falle
       alert.handleAlert(

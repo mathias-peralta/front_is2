@@ -1,4 +1,4 @@
-import { registerUser } from "@/api/auth";
+import { registerUser } from "@/api/apiAuth";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import {
