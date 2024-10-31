@@ -1,13 +1,23 @@
-import { crearLista } from "@/api/apiListas";
+import { crearLista, getListByIdTablero } from "@/api/apiListas";
 import HomeLayout from "@/layouts/home/layout";
+import { ListasByIDTableroResponse } from "@/models/response/listaResponse";
 import AlertContext from "@/providers/alertProvider";
 import { Add } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
   CircularProgress,
   Divider,
+  IconButton,
   Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -23,14 +33,23 @@ interface FormikProps {
 const ListPage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [listas, setListas] = useState<ListasByIDTableroResponse[] | null>(
+    null
+  );
   const alert = useContext(AlertContext);
   const { param1, param2 } = router.query; // `id` es el parámetro dinámico que obtienes de la URL
 
   useEffect(() => {
-    getAllTablerosById();
+    getListas();
   }, []);
 
-  const getAllTablerosById = async () => {};
+  const getListas = async () => {
+    setIsLoading(true);
+    const listaResponse = await getListByIdTablero(param2 ? +param2 : 0);
+    setListas(listaResponse);
+    setIsLoading(false);
+  };
+
   const handleOpen = () => setModalIsOpen(true);
   const handleClose = () => setModalIsOpen(false);
   const handleNavigate = (id: number) => {};
@@ -43,7 +62,7 @@ const ListPage = () => {
   const handleOnSubmit = async () => {
     setIsLoading(true);
     const crearListaResponse = await crearLista({
-      id_tablero: param1 ? +param1 : 0,
+      id_tablero: param2 ? +param2 : 0,
       estado: "activo",
       max_tareas: +values.listMaxLength,
       nombre_lista: values.listName,
@@ -88,7 +107,9 @@ const ListPage = () => {
       </Box>
     );
   }
-
+  if (listas === null) {
+    return <Typography>algo salio mal, intente nuevamente</Typography>;
+  }
   return (
     <>
       <Modal
@@ -136,6 +157,43 @@ const ListPage = () => {
         Nueva Lista
       </Button>
       <Divider sx={{ marginTop: 5, marginBottom: 5 }} />
+
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {listas.map((item) => (
+                  <TableCell
+                    key={item.id_lista}
+                    align={"center"}
+                    style={{ minWidth: 100 }}
+                  >
+                    {item.nombre_lista}
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => console.log(item)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {[].map((row) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={1}>
+                    <TableCell key={1} align={"center"}>
+                      'hola'
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </>
   );
 };

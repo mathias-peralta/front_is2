@@ -103,9 +103,11 @@ const HomePage = () => {
       </Box>
     );
   }
+
   if (tableroList === null) {
     return <Typography>algo salio mal, intente nuevamente</Typography>;
   }
+
   return (
     <>
       <Modal
@@ -169,7 +171,7 @@ const HomePage = () => {
             ))}
         </Grid>
       ) : (
-        <Typography>no hay datos</Typography>
+        <Typography variant="h5">¡Aún no hay tableros creados!</Typography>
       )}
     </>
   );

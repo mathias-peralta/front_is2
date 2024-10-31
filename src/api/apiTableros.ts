@@ -8,6 +8,8 @@ export const getTablerosByWorkspace = async (idEspacio: number) => {
       "/api/tableros_all/" + idEspacio
     );
 
+    if (tableroResponse.status === 204) return [];
+
     if (tableroResponse.status !== 200) return null;
 
     return tableroResponse.data;
