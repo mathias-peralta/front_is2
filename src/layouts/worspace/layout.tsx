@@ -6,10 +6,8 @@ import { selectUser } from "@/redux/features/userSlice";
 import { RootState } from "@/redux/store";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Home from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
-import TableChartIcon from "@mui/icons-material/TableChart";
 import WorkIcon from "@mui/icons-material/Work";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -113,7 +111,7 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
-const HomeLayout = ({ children }: Props) => {
+const WorkspaceLayout = ({ children }: Props) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
@@ -167,54 +165,6 @@ const HomeLayout = ({ children }: Props) => {
         </DrawerHeader>
         <Divider />
         <List>
-          <ListItem key={"Inicio"} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              onClick={() => router.push("/")}
-              sx={[
-                {
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: "initial",
-                    }
-                  : {
-                      justifyContent: "center",
-                    },
-              ]}
-            >
-              <ListItemIcon
-                sx={[
-                  {
-                    minWidth: 0,
-                    justifyContent: "center",
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                <Home />
-              </ListItemIcon>
-              <ListItemText
-                primary={"Inicio"}
-                sx={[
-                  open
-                    ? {
-                        opacity: 1,
-                      }
-                    : {
-                        opacity: 0,
-                      },
-                ]}
-              />
-            </ListItemButton>
-          </ListItem>
           <ListItem key={"workspace"} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               onClick={() => router.push("/espacioDeTrabajos")}
@@ -251,54 +201,6 @@ const HomeLayout = ({ children }: Props) => {
               </ListItemIcon>
               <ListItemText
                 primary={"Espacio de trabajo"}
-                sx={[
-                  open
-                    ? {
-                        opacity: 1,
-                      }
-                    : {
-                        opacity: 0,
-                      },
-                ]}
-              />
-            </ListItemButton>
-          </ListItem>
-          <ListItem key={"tablero"} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              onClick={() => router.push("/tablero")}
-              sx={[
-                {
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: "initial",
-                    }
-                  : {
-                      justifyContent: "center",
-                    },
-              ]}
-            >
-              <ListItemIcon
-                sx={[
-                  {
-                    minWidth: 0,
-                    justifyContent: "center",
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                <TableChartIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={"Tablero"}
                 sx={[
                   open
                     ? {
@@ -376,4 +278,4 @@ const HomeLayout = ({ children }: Props) => {
   );
 };
 
-export default HomeLayout;
+export default WorkspaceLayout;

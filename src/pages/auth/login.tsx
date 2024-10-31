@@ -1,7 +1,8 @@
-import { loginUser } from "@/api/auth";
+import { getUserById } from "@/api/apiUsers";
 import AuthLayout from "@/layouts/auth/layout";
 import AlertContext from "@/providers/alertProvider";
 import { setToken } from "@/redux/features/authSlice";
+import { setUser } from "@/redux/features/userSlice";
 import {
   Button,
   Checkbox,
@@ -12,7 +13,9 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import axios from "axios";
 import { useFormik } from "formik";
+import { jwtDecode } from "jwt-decode";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -35,15 +38,27 @@ const AuthLoginPage = (params: any) => {
 
   const handleLogin = async () => {
     try {
-      const response = await loginUser({
+      const response = await axios.post("/api/login", {
         correo_usuario: values.emailUser,
         password_usuario: values.password,
       });
-      if (!response) throw new Error("Error en el login");
 
-      dispatch(setToken(response.token));
+      if (response.status !== 200) throw new Error("Error en el login");
+
+      const decoded = jwtDecode(response.data.token);
+      const userData = await getUserById(decoded?.userId);
+
+      if (!userData) throw new Error("Error al obtener datos del usuario");
+
+      dispatch(setToken(response.data.token));
+      dispatch(
+        setUser({
+          user: userData,
+        })
+      );
+
       // Redirigir al home
-      router.push("/");
+      router.push("/espacioDeTrabajos");
     } catch (error) {
       // Mostrar un mensaje de error en caso de que el login falle
       alert.handleAlert(
