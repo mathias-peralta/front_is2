@@ -4,13 +4,13 @@ interface Props {
 
 import { selectUser } from "@/redux/features/userSlice";
 import { RootState } from "@/redux/store";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Home from "@mui/icons-material/Home";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import TableChartIcon from "@mui/icons-material/TableChart";
-import WorkIcon from "@mui/icons-material/Work";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -29,6 +29,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { useSelector } from "react-redux";
+
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -169,7 +170,7 @@ const HomeLayout = ({ children }: Props) => {
         <List>
           <ListItem key={"Inicio"} disablePadding sx={{ display: "block" }}>
             <ListItemButton
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
               sx={[
                 {
                   minHeight: 48,
@@ -199,7 +200,7 @@ const HomeLayout = ({ children }: Props) => {
                       },
                 ]}
               >
-                <Home />
+                <DashboardIcon />
               </ListItemIcon>
               <ListItemText
                 primary={"Inicio"}
@@ -215,57 +216,9 @@ const HomeLayout = ({ children }: Props) => {
               />
             </ListItemButton>
           </ListItem>
-          <ListItem key={"workspace"} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              onClick={() => router.push("/espacioDeTrabajos")}
-              sx={[
-                {
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: "initial",
-                    }
-                  : {
-                      justifyContent: "center",
-                    },
-              ]}
-            >
-              <ListItemIcon
-                sx={[
-                  {
-                    minWidth: 0,
-                    justifyContent: "center",
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                <WorkIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={"Espacio de trabajo"}
-                sx={[
-                  open
-                    ? {
-                        opacity: 1,
-                      }
-                    : {
-                        opacity: 0,
-                      },
-                ]}
-              />
-            </ListItemButton>
-          </ListItem>
           <ListItem key={"tablero"} disablePadding sx={{ display: "block" }}>
             <ListItemButton
-              onClick={() => router.push("/tablero")}
+              onClick={() => router.push("/espacioDeTrabajos")}
               sx={[
                 {
                   minHeight: 48,
@@ -299,6 +252,54 @@ const HomeLayout = ({ children }: Props) => {
               </ListItemIcon>
               <ListItemText
                 primary={"Tablero"}
+                sx={[
+                  open
+                    ? {
+                        opacity: 1,
+                      }
+                    : {
+                        opacity: 0,
+                      },
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key={"tarjetas"} disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              onClick={() => router.push("/tarjetas")}
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: "initial",
+                    }
+                  : {
+                      justifyContent: "center",
+                    },
+              ]}
+            >
+              <ListItemIcon
+                sx={[
+                  {
+                    minWidth: 0,
+                    justifyContent: "center",
+                  },
+                  open
+                    ? {
+                        mr: 3,
+                      }
+                    : {
+                        mr: "auto",
+                      },
+                ]}
+              >
+                <AssignmentIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Tareas"}
                 sx={[
                   open
                     ? {
