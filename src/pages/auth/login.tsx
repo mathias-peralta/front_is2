@@ -45,7 +45,7 @@ const AuthLoginPage = (params: any) => {
 
       if (response.status !== 200) throw new Error("Error en el login");
 
-      const decoded = jwtDecode(response.data.token);
+      const decoded = jwtDecode<any>(response.data.token);
       const userData = await getUserById(decoded?.userId);
 
       if (!userData) throw new Error("Error al obtener datos del usuario");
@@ -86,7 +86,7 @@ const AuthLoginPage = (params: any) => {
     handleSubmit,
   } = useFormik<FormikProps>({
     initialValues: {
-      emailUser: "alexander@gmail.com",
+      emailUser: "mathias@fpuna.edu.py",
       password: "holamundo",
       submit: null,
     },

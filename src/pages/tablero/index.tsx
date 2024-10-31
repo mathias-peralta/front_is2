@@ -1,6 +1,6 @@
 import { getAllWorkspacesById } from "@/api/apiWorkspace";
 import HomeLayout from "@/layouts/home/layout";
-import { WorkspaceResponse } from "@/models/response/workspaceResponse";
+import { Workspace } from "@/models/response/workspaceResponse";
 import AlertContext from "@/providers/alertProvider";
 import {
   Alert,
@@ -40,9 +40,7 @@ interface FormikProps {
 const TableroPage = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [workspaceList, setWorkspaceList] = useState<
-    WorkspaceResponse[] | null
-  >(null);
+  const [workspaceList, setWorkspaceList] = useState<Workspace[] | null>(null);
   const alert = useContext(AlertContext);
 
   useEffect(() => {
@@ -50,7 +48,7 @@ const TableroPage = () => {
   }, []);
 
   const getData = async () => {
-    const workspaceList = await getAllWorkspacesById();
+    const workspaceList = await getAllWorkspacesById(1);
     setWorkspaceList(workspaceList);
   };
 
