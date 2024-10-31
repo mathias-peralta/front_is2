@@ -51,9 +51,21 @@ export const getListByIdTablero = async (idTablero: number) => {
 
 export const deleteByIdLista = async (idLista: number) => {
   try {
-    const listResponse = await API.delete<ListasByIDTableroResponse[]>(
-      "/api/listas/" + idLista
-    );
+    const listResponse = await API.delete("/api/listas/" + idLista);
+
+    if (listResponse.status !== 200) return null;
+
+    return true;
+  } catch {
+    return null;
+  }
+};
+
+export const updateByIdLista = async (idLista: number, nombreLista: string) => {
+  try {
+    const listResponse = await API.put("/api/listas/" + idLista, {
+      nombre_lista: nombreLista,
+    });
 
     if (listResponse.status !== 200) return null;
 

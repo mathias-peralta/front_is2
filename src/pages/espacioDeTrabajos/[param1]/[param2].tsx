@@ -2,6 +2,7 @@ import {
   crearLista,
   deleteByIdLista,
   getListByIdTablero,
+  updateByIdLista,
 } from "@/api/apiListas";
 import HomeLayout from "@/layouts/home/layout";
 import { ListasByIDTableroResponse } from "@/models/response/listaResponse";
@@ -74,6 +75,26 @@ const ListPage = () => {
     if (!deleteLista) {
       alert.handleAlert(
         "No se pudo eliminar la lista, intente de nuevo mas tarde",
+        3,
+        "error"
+      );
+      setIsLoading(false);
+      return;
+    }
+    getListas();
+  };
+
+  const handleUpdateLista = async () => {
+    setIsLoading(true);
+    handleCloseModalEdit();
+    const updateListaResponse = await updateByIdLista(
+      listaSeleccionada ? listaSeleccionada.id_lista : 0,
+      listaSeleccionada ? listaSeleccionada.nombre_lista : ""
+    );
+
+    if (!updateListaResponse) {
+      alert.handleAlert(
+        "No se pudo editar la lista, intente de nuevo mas tarde",
         3,
         "error"
       );
@@ -190,8 +211,16 @@ const ListPage = () => {
             fullWidth
             label="Nombre"
             name="Nombre"
-            onBlur={handleBlur("listName")}
-            onChange={handleChange("listName")}
+            onChange={(e) =>
+              setListaSeleccionada({
+                id_lista: listaSeleccionada?.id_lista || 0,
+                nombre_lista: e.target.value,
+                max_tareas: listaSeleccionada?.max_tareas || 0,
+                orden: listaSeleccionada?.orden || 0,
+                estado: listaSeleccionada?.estado || "",
+                id_tablero: listaSeleccionada?.id_tablero || 0,
+              })
+            }
             type="Nombre"
             value={listaSeleccionada ? listaSeleccionada?.nombre_lista : ""}
             sx={{ marginBottom: 1 }}
@@ -205,7 +234,7 @@ const ListPage = () => {
           >
             eliminar
           </Button>
-          <Button variant="contained" onClick={() => handleSubmit()} fullWidth>
+          <Button variant="contained" onClick={handleUpdateLista} fullWidth>
             actualizar
           </Button>
         </Box>
